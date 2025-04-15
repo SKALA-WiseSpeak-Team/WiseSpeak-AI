@@ -9,13 +9,13 @@ router = APIRouter()
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_file(file: UploadFile = File(...)):
-    """PDF 파일 업로드 및 텍스트 추출"""
+    """PDF 파일 업로드"""
     # 파일 확장자 검증
     if not file.filename.lower().endswith('.pdf'):
         raise HTTPException(status_code=400, detail="PDF 파일만 업로드 가능합니다")
     
     # PDF 파일 처리
-    result = await PDFService.extract_text_from_pdf(file)
+    result = await PDFService.upload_raw_pdf(file)
     
     return {
         "temp_file_id": result["temp_file_id"],
