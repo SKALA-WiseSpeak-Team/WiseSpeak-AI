@@ -1,2 +1,15 @@
-fastapi>=0.115.8,<0.116.0
-uvicorn[standard]>=0.34.0,<0.35.0
+fastapi==0.105.0
+uvicorn==0.24.0
+python-dotenv==1.0.0
+pydantic==2.5.2
+pydantic-settings>=2.0.0  # Pydantic 설정 관련 패키지 추가
+python-multipart==0.0.6
+httpx>=0.24.0,<0.25.0     # Supabase와 호환되는 버전으로 수정
+supabase==2.0.0
+PyPDF2==3.0.1
+openai==1.5.0
+pytest==7.4.3
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+python-jose==3.3.0
+tenacity==8.2.3
