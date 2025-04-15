@@ -17,10 +17,7 @@ pip install -r requirements.txt
 
 ### API 키 설정 방법
 #### `.env` 파일 사용 
-프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 다음과 같이 API 키를 저장하세요.
-```
-OPENAI_API_KEY="your_openai_api_key_here"
-```
+프로젝트 app 디렉토리에 `.env.example` 파일을 참고하여 .env로 생성하고 다음과 같이 API 키를 저장하세요.
 
 ### 2️⃣ 실행 방법
 프로젝트 루트 디렉토리에서 실행
