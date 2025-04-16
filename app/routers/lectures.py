@@ -1,9 +1,6 @@
-from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Query, Path, Depends, UploadFile, File, Form, Request
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Request
 from app.db.session import supabase
-from app.models.lecture import LectureResponse, LecturesResponse, LectureCreate
-from app.models.page import PageResponse
-import json
+from app.models.lecture import LectureResponse, LecturesResponse
 import os
 import uuid
 from PyPDF2 import PdfReader

@@ -8,7 +8,7 @@ CREATE TABLE public.lectures (
     description TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     pdf_url TEXT NOT NULL,
-    total_pages INTEGER NOT NULL,
+    total_pages INTEGER NOT NULL
 );
 
 -- 페이지 테이블

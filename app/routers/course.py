@@ -1,8 +1,7 @@
-from fastapi import APIRouter, HTTPException, Query, Path, Depends
+from fastapi import APIRouter, HTTPException, Query
 from app.db.session import supabase
 from app.services.voice_service import VoiceService
 from app.models.course import CourseResponse
-from app.core.config import settings
 import pathlib
 import uuid
 

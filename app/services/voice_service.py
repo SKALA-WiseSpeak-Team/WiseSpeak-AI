@@ -1,6 +1,5 @@
-import uuid
 import os
-from fastapi import UploadFile, File
+from fastapi import UploadFile
 from tempfile import NamedTemporaryFile
 from pathlib import Path
 from app.db.session import supabase
