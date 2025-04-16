@@ -35,7 +35,10 @@ async def get_course(
   voice_file_url = audio_info["voice_url"]
 
   return {
-      "course_id": id,
+      "id": id,
+      "title": course_info.data["title"],
+      "description": course_info.data["description"],
+      "created_at" : course_info.data["created_at"],
       "pdf_url": pdf_url,
       "voice_file_url": voice_file_url
   }
