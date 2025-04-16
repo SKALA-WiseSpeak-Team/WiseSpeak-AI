@@ -7,7 +7,7 @@ import uuid
 
 router = APIRouter()
 
-@router.get("/api/course/{id}", response_model=CourseResponse)
+@router.get("/course/{id}", response_model=CourseResponse)
 async def get_course(
     id: str,
     voice_style: str = Query(None, description="음성 스타일"),
