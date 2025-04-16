@@ -10,3 +10,6 @@ wsvenv/
 __pycache__/
 *.py[cod]
 *.class
+myvenv/
+.vscode/
+.env.example

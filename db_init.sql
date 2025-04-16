@@ -9,8 +9,6 @@ CREATE TABLE public.lectures (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     pdf_url TEXT NOT NULL,
     total_pages INTEGER NOT NULL,
-    language TEXT DEFAULT 'ko',
-    voice_type TEXT DEFAULT 'female_adult'
 );
 
 -- 페이지 테이블
@@ -24,7 +22,6 @@ CREATE TABLE public.pages (
 );
 
 -- 인덱스 생성
-CREATE INDEX lectures_language_idx ON public.lectures (language);
 CREATE INDEX lectures_created_at_idx ON public.lectures (created_at DESC);
 CREATE INDEX pages_lecture_id_idx ON public.pages (lecture_id);
 CREATE INDEX pages_lecture_page_idx ON public.pages (lecture_id, page_number);

@@ -6,16 +6,18 @@ from datetime import datetime
 class LectureCreate(BaseModel):
     title: str
     description: Optional[str] = None
-    language: str = "ko"
-    voice_type: str = "female_adult"
+    pdf_url: str
+    total_pages: int
+    
 
 # 강의 처리 요청 스키마
 class LectureProcess(BaseModel):
     temp_file_id: str
     title: str
     description: Optional[str] = None
-    language: str = "ko"
-    voice_type: str = "female_adult"
+    pdf_url: str
+    total_pages: int
+    
 
 # 강의 응답 스키마
 class LectureResponse(BaseModel):
@@ -25,7 +27,6 @@ class LectureResponse(BaseModel):
     created_at: datetime
     pdf_url: str
     total_pages: int
-    language: str
 
 # 강의 목록 응답 스키마
 class LecturesResponse(BaseModel):
