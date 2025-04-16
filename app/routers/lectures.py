@@ -1,5 +1,5 @@
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Query, Path, Depends, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Query, Path, Depends, UploadFile, File, Form, Request
 from app.db.session import supabase
 from app.models.lecture import LectureResponse, LecturesResponse, LectureCreate
 from app.models.page import PageResponse
@@ -8,37 +8,41 @@ import os
 import uuid
 from PyPDF2 import PdfReader
 import io
+import logging
+
+# 로거 설정
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 @router.get("/lectures", response_model=LecturesResponse)
-async def get_lectures(
-    limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-    search: Optional[str] = None
-):
+async def get_lectures(request: Request):
     """모든 강의 목록 조회"""
-    query = supabase.table("lectures").select("*")
-    
-    # 검색어 필터링
-    if search:
-        query = query.ilike("title", f"%{search}%")
-    
-    # 총 개수 조회 (필터링 적용)
-    count_query = query
-    count_result = count_query.execute()
-    total = len(count_result.data)
-    
-    # 페이지네이션 적용
-    query = query.order("created_at", desc=True).range(offset, offset + limit - 1)
-    result = query.execute()
-    
-    return {
-        "data": result.data,
-        "total": total,
-        "limit": limit,
-        "offset": offset
-    }
+    try:
+        # 클라이언트 정보 로깅
+        client_ip = request.client.host
+        logger.info(f"클라이언트 접속 - IP: {client_ip}")
+        
+        query = supabase.table("lectures").select("*")
+        result = query.execute()
+        
+        return {
+            "data": result.data
+        }
+        
+    except Exception as e:
+        # 클라이언트 IP와 함께 에러 로깅
+        client_ip = request.client.host
+        error_msg = f"강의 목록 조회 중 오류 발생 - 클라이언트 IP: {client_ip}, 에러: {str(e)}"
+        logger.error(error_msg)
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "강의 목록을 불러오는 중 오류가 발생했습니다",
+                "error": str(e),
+                "client_ip": client_ip
+            }
+        )
 
 @router.get("/lectures/{lecture_id}", response_model=LectureResponse)
 async def get_lecture(
@@ -194,5 +198,3 @@ async def get_lecture_pages(
 #             }
 #         )
 ###
-
-
