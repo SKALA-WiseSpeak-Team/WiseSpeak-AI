@@ -37,17 +37,11 @@ CREATE POLICY "모든 사용자가 강의를 볼 수 있음" ON public.lectures
 CREATE POLICY "모든 사용자가 강의를 생성할 수 있음" ON public.lectures
     FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "모든 사용자가 강의를 삭제할 수 있음" ON public.lectures
-    FOR DELETE USING (true);
-
 CREATE POLICY "모든 사용자가 페이지를 볼 수 있음" ON public.pages
     FOR SELECT USING (true);
 
 CREATE POLICY "모든 사용자가 페이지를 생성할 수 있음" ON public.pages
     FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "모든 사용자가 페이지를 삭제할 수 있음" ON public.pages
-    FOR DELETE USING (true);
 
 -- 스토리지 버킷 설정 명령어 (Supabase 대시보드에서 수동으로 생성해야 함)
 -- 1. wisespeak 버킷 생성
