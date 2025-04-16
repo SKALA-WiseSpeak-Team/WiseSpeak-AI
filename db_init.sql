@@ -9,8 +9,6 @@ CREATE TABLE public.lectures (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     pdf_url TEXT NOT NULL,
     total_pages INTEGER NOT NULL,
-    language TEXT DEFAULT 'ko',
-    voice_type TEXT DEFAULT 'female_adult'
 );
 
 -- 페이지 테이블
@@ -24,7 +22,6 @@ CREATE TABLE public.pages (
 );
 
 -- 인덱스 생성
-CREATE INDEX lectures_language_idx ON public.lectures (language);
 CREATE INDEX lectures_created_at_idx ON public.lectures (created_at DESC);
 CREATE INDEX pages_lecture_id_idx ON public.pages (lecture_id);
 CREATE INDEX pages_lecture_page_idx ON public.pages (lecture_id, page_number);
@@ -40,11 +37,17 @@ CREATE POLICY "모든 사용자가 강의를 볼 수 있음" ON public.lectures
 CREATE POLICY "모든 사용자가 강의를 생성할 수 있음" ON public.lectures
     FOR INSERT WITH CHECK (true);
 
+CREATE POLICY "모든 사용자가 강의를 삭제할 수 있음" ON public.lectures
+    FOR DELETE USING (true);
+
 CREATE POLICY "모든 사용자가 페이지를 볼 수 있음" ON public.pages
     FOR SELECT USING (true);
 
 CREATE POLICY "모든 사용자가 페이지를 생성할 수 있음" ON public.pages
     FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "모든 사용자가 페이지를 삭제할 수 있음" ON public.pages
+    FOR DELETE USING (true);
 
 -- 스토리지 버킷 설정 명령어 (Supabase 대시보드에서 수동으로 생성해야 함)
 -- 1. wisespeak 버킷 생성

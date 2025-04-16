@@ -1,8 +1,9 @@
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, Query, Path, Depends
 from app.db.session import supabase
-from app.models.lecture import LectureResponse, LecturesResponse
+from app.models.lecture import LectureResponse, LecturesResponse, LectureCreate
 from app.models.page import PageResponse
+import json
 
 router = APIRouter()
 
@@ -10,8 +11,7 @@ router = APIRouter()
 async def get_lectures(
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    search: Optional[str] = None,
-    language: Optional[str] = None
+    search: Optional[str] = None
 ):
     """모든 강의 목록 조회"""
     query = supabase.table("lectures").select("*")
@@ -19,10 +19,6 @@ async def get_lectures(
     # 검색어 필터링
     if search:
         query = query.ilike("title", f"%{search}%")
-    
-    # 언어 필터링
-    if language:
-        query = query.eq("language", language)
     
     # 총 개수 조회 (필터링 적용)
     count_query = query
@@ -51,6 +47,29 @@ async def get_lecture(
         raise HTTPException(status_code=404, detail="강의를 찾을 수 없습니다")
     
     return result.data
+
+@router.post("/lectures", response_model=LectureResponse)
+async def create_lecture(
+    lecture: LectureCreate
+):
+    """새로운 강의 생성"""
+    from uuid import uuid4
+    json_data = {
+        "id": str(uuid4()),
+        "title": lecture.title,
+        "description": lecture.description,
+        "pdf_url": lecture.pdf_url,
+        "total_pages": lecture.total_pages
+    }
+
+    result = supabase.table("lectures").insert(json_data).execute()
+
+    if not result.data:
+        raise HTTPException(status_code=400, detail="강의 생성에 실패했습니다")
+
+    return result.data[0]
+
+
 
 @router.get("/lectures/{lecture_id}/pages/{page_number}", response_model=PageResponse)
 async def get_lecture_page(
