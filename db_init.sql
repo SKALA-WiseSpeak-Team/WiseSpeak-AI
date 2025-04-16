@@ -21,15 +21,30 @@ CREATE TABLE public.pages (
     UNIQUE(lecture_id, page_number)
 );
 
+-- 스크립트 테이블
+CREATE TABLE public.text (
+    id UUID PRIMARY KEY,
+    lecture_id UUID REFERENCES public.lectures(id) ON DELETE CASCADE,
+    language VARCHAR(50),
+    voice_type VARCHAR(50),
+    txt_url TEXT,
+    mp3_url TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- 인덱스 생성
 CREATE INDEX lectures_created_at_idx ON public.lectures (created_at DESC);
 CREATE INDEX pages_lecture_id_idx ON public.pages (lecture_id);
 CREATE INDEX pages_lecture_page_idx ON public.pages (lecture_id, page_number);
+CREATE INDEX text_lecture_id_idx ON public.text (lecture_id);
+CREATE INDEX text_lecture_language_idx ON public.text (lecture_id, language);
+CREATE INDEX text_created_at_idx ON public.text (created_at DESC);
 
 -- RLS(Row Level Security) 정책 설정
 -- MVP 단계에서는 모든 사용자에게 접근 권한 부여
 ALTER TABLE public.lectures ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.text ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "모든 사용자가 강의를 볼 수 있음" ON public.lectures
     FOR SELECT USING (true);
@@ -41,6 +56,11 @@ CREATE POLICY "모든 사용자가 페이지를 볼 수 있음" ON public.pages
     FOR SELECT USING (true);
 
 CREATE POLICY "모든 사용자가 페이지를 생성할 수 있음" ON public.pages
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "모든 사용자가 text를 볼 수 있음" ON public.text
+    FOR SELECT USING (true);
+CREATE POLICY "모든 사용자가 text를 생성할 수 있음" ON public.text
     FOR INSERT WITH CHECK (true);
 
 -- 스토리지 버킷 설정 명령어 (Supabase 대시보드에서 수동으로 생성해야 함)
