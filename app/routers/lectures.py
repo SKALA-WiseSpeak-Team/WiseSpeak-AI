@@ -44,18 +44,6 @@ async def get_lectures(request: Request):
             }
         )
 
-@router.get("/lectures/{lecture_id}", response_model=LectureResponse)
-async def get_lecture(
-    lecture_id: str = Path(..., description="강의 ID")
-):
-    """특정 강의 상세 정보 조회"""
-    result = supabase.table("lectures").select("*").eq("id", lecture_id).single().execute()
-    
-    if not result.data:
-        raise HTTPException(status_code=404, detail="강의를 찾을 수 없습니다")
-    
-    return result.data
-
 @router.post("/lectures", response_model=LectureResponse)
 def create_lecture(
     file: UploadFile = File(...),
@@ -117,42 +105,6 @@ def create_lecture(
         # 파일 핸들러 닫기
         file.file.close()
 
-@router.get("/lectures/{lecture_id}/pages/{page_number}", response_model=PageResponse)
-async def get_lecture_page(
-    lecture_id: str = Path(..., description="강의 ID"),
-    page_number: int = Path(..., description="페이지 번호", ge=1)
-):
-    """특정 강의의 특정 페이지 정보 조회"""
-    result = supabase.table("pages") \
-        .select("*") \
-        .eq("lecture_id", lecture_id) \
-        .eq("page_number", page_number) \
-        .single() \
-        .execute()
-    
-    if not result.data:
-        raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다")
-    
-    return result.data
-
-@router.get("/lectures/{lecture_id}/pages", response_model=List[PageResponse])
-async def get_lecture_pages(
-    lecture_id: str = Path(..., description="강의 ID")
-):
-    """특정 강의의 모든 페이지 정보 조회"""
-    result = supabase.table("pages") \
-        .select("*") \
-        .eq("lecture_id", lecture_id) \
-        .order("page_number", desc=False) \
-        .execute()
-    
-    if not result.data:
-        raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다")
-    
-    return result.data
-
-
-
 # delete 필요시 사용
 
     #권한 부여 해야함 !!
@@ -198,3 +150,15 @@ async def get_lecture_pages(
 #             }
 #         )
 ###
+
+# @router.get("/lectures/{lecture_id}", response_model=LectureResponse)
+# async def get_lecture(
+#     lecture_id: str = Path(..., description="강의 ID")
+# ):
+#     """특정 강의 상세 정보 조회"""
+#     result = supabase.table("lectures").select("*").eq("id", lecture_id).single().execute()
+    
+#     if not result.data:
+#         raise HTTPException(status_code=404, detail="강의를 찾을 수 없습니다")
+    
+#     return result.data

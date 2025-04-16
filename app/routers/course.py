@@ -7,7 +7,7 @@ import pathlib
 
 router = APIRouter()
 
-@router.get("/api/course/{id}")
+@router.get("/api/course/{id}", response_model=CourseResponse)
 async def get_course(
     id: str,
     voice_style: str = Query(None, description="음성 스타일"),
@@ -33,12 +33,14 @@ async def get_course(
   
   pdf_url = course_info.data["pdf_url"]
   voice_file_url = audio_info["voice_url"]
-
-  return {
+  
+  result = {
       "id": id,
       "title": course_info.data["title"],
       "description": course_info.data["description"],
       "created_at" : course_info.data["created_at"],
       "pdf_url": pdf_url,
-      "voice_file_url": voice_file_url
+      "voice_url": voice_file_url
   }
+  
+  return result
