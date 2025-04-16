@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers import lectures, upload, chat
+from app.routers import lectures, upload, chat, course
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -22,6 +22,7 @@ if settings.BACKEND_CORS_ORIGINS:
 app.include_router(lectures.router, prefix=settings.API_V1_STR)
 app.include_router(upload.router, prefix=settings.API_V1_STR)
 app.include_router(chat.router, prefix=settings.API_V1_STR)
+app.include_router(course.router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def read_root():
