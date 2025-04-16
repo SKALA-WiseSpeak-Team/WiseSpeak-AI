@@ -1,3 +1,7 @@
+from typing import Optional, List
+from pydantic import BaseModel
+from datetime import datetime
+
 # 강의 생성 요청 스키마
 class LectureCreate(BaseModel):
     title: str
