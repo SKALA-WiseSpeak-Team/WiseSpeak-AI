@@ -27,7 +27,7 @@ class PDFService:
 
             # Supabase Storage 업로드
             with open(tmp_path, 'rb') as f:
-                file_path = f"temp/{temp_file_id}{suffix}"
+                file_path = f"lectures/{temp_file_id}{suffix}"
                 supabase.storage.from_(settings.STORAGE_BUCKET).upload(
                     file_path,
                     f.read()

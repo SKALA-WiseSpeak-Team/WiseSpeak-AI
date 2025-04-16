@@ -1,9 +1,13 @@
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Query, Path, Depends
+from fastapi import APIRouter, HTTPException, Query, Path, Depends, UploadFile, File, Form
 from app.db.session import supabase
 from app.models.lecture import LectureResponse, LecturesResponse, LectureCreate
 from app.models.page import PageResponse
 import json
+import os
+import uuid
+from PyPDF2 import PdfReader
+import io
 
 router = APIRouter()
 
@@ -49,27 +53,65 @@ async def get_lecture(
     return result.data
 
 @router.post("/lectures", response_model=LectureResponse)
-async def create_lecture(
-    lecture: LectureCreate
+def create_lecture(
+    file: UploadFile = File(...),
+    title: str = Form(...),
+    description: str = Form(None)
 ):
     """새로운 강의 생성"""
-    from uuid import uuid4
-    json_data = {
-        "id": str(uuid4()),
-        "title": lecture.title,
-        "description": lecture.description,
-        "pdf_url": lecture.pdf_url,
-        "total_pages": lecture.total_pages
-    }
+    try:
+        # 파일 확장자 검증
+        if not file.filename.lower().endswith('.pdf'):
+            raise HTTPException(status_code=400, detail="PDF 파일만 업로드 가능합니다")
+        
+        # PDF 파일 읽기
+        file_content = file.file.read()
+        
+        # PDF 페이지 수 계산
+        pdf_reader = PdfReader(io.BytesIO(file_content))
+        total_pages = len(pdf_reader.pages)
+        
+        # PDF 파일 저장을 위한 고유 ID 생성
+        file_id = str(uuid.uuid4())
+        file_extension = os.path.splitext(file.filename)[1]
+        file_name = f"{file_id}{file_extension}"
+        
+        # Storage에 파일 업로드
+        storage_path = f"lectures/{file_name}"
+        storage_response = supabase.storage.from_("wisespeak").upload(
+            storage_path,
+            file_content,
+            {"content-type": "application/pdf"}
+        )
+        
+        if not storage_response:
+            raise HTTPException(status_code=400, detail="PDF 파일 업로드에 실패했습니다")
+        
+        # 업로드된 파일의 공개 URL 가져오기
+        pdf_url = supabase.storage.from_("wisespeak").get_public_url(storage_path)
+        
+        # 강의 데이터 생성
+        lecture_data = {
+            "id": str(uuid.uuid4()),
+            "title": title,
+            "description": description,
+            "pdf_url": pdf_url,
+            "total_pages": total_pages
+        }
 
-    result = supabase.table("lectures").insert(json_data).execute()
+        # 강의 데이터 저장
+        result = supabase.table("lectures").insert(lecture_data).execute()
 
-    if not result.data:
-        raise HTTPException(status_code=400, detail="강의 생성에 실패했습니다")
+        if not result.data:
+            raise HTTPException(status_code=400, detail="강의 생성에 실패했습니다")
 
-    return result.data[0]
-
-
+        return result.data[0]
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        # 파일 핸들러 닫기
+        file.file.close()
 
 @router.get("/lectures/{lecture_id}/pages/{page_number}", response_model=PageResponse)
 async def get_lecture_page(
@@ -104,6 +146,7 @@ async def get_lecture_pages(
         raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다")
     
     return result.data
+
 
 
 # delete 필요시 사용
@@ -151,3 +194,5 @@ async def get_lecture_pages(
 #             }
 #         )
 ###
+
+
