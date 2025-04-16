@@ -9,5 +9,4 @@ class CourseResponse(BaseModel):
     description: Optional[str] = None
     created_at: datetime
     pdf_url: str
-    total_pages: int
-    language: str
+    voice_url: str
