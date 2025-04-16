@@ -104,3 +104,49 @@ async def get_lecture_pages(
         raise HTTPException(status_code=404, detail="페이지를 찾을 수 없습니다")
     
     return result.data
+
+
+# delete 필요시 사용
+
+    #권한 부여 해야함 !!
+# @router.delete("/lectures/{lecture_id}")
+# async def delete_lecture(
+#     lecture_id: str = Path(..., description="강의 ID")
+# ):
+#     """강의 삭제"""
+#     try:
+#         # 강의 존재 여부 확인
+#         lecture = supabase.table("lectures").select("*").eq("id", lecture_id).single().execute()
+        
+#         if not lecture.data:
+#             raise HTTPException(status_code=404, detail="강의를 찾을 수 없습니다")
+        
+#         # 강의 삭제 (CASCADE로 인해 관련된 페이지들도 자동 삭제)
+#         result = supabase.table("lectures").delete().eq("id", lecture_id).execute()
+        
+#         # 삭제 결과 확인
+#         if not result or not hasattr(result, 'data'):
+#             print(f"삭제 실패 - 결과: {result}")
+#             raise HTTPException(
+#                 status_code=400, 
+#                 detail={
+#                     "message": "강의 삭제에 실패했습니다",
+#                     "error": "삭제 작업이 실패했습니다"
+#                 }
+#             )
+        
+#         return {"message": "강의가 성공적으로 삭제되었습니다"}
+    
+#     except HTTPException as he:
+#         # 이미 처리된 HTTP 예외는 그대로 전달
+#         raise he
+#     except Exception as e:
+#         # 기타 예외는 로깅하고 500 에러 반환
+#         print(f"강의 삭제 중 오류 발생: {str(e)}")
+#         raise HTTPException(
+#             status_code=500,
+#             detail={
+#                 "message": "강의 삭제 중 오류가 발생했습니다",
+#                 "error": str(e)
+#             }
+#         )
