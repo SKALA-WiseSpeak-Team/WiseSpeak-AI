@@ -1,15 +1,61 @@
+# 웹 프레임워크 및 API
 fastapi==0.105.0
 uvicorn==0.24.0
-python-dotenv==1.0.0
-pydantic==2.5.2
-pydantic-settings>=2.0.0  # Pydantic 설정 관련 패키지 추가
 python-multipart==0.0.6
-httpx>=0.24.0,<0.25.0     # Supabase와 호환되는 버전으로 수정
+httpx>=0.24.0,<0.25.0
+
+# 데이터 검증 및 설정
+pydantic==2.5.2
+pydantic-settings>=2.0.0
+python-dotenv==1.0.0
+
+# 데이터베이스
 supabase==2.0.0
-PyPDF2==3.0.1
-openai==1.5.0
-pytest==7.4.3
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
-python-jose==3.3.0
+
+# PDF 처리 관련
+PyPDF2==3.0.1
+pdfplumber==0.10.3
+camelot-py==0.11.0
+tabula-py==2.9.0
+pdf2image==1.17.0
+pytesseract==0.3.10
+opencv-python==4.8.1.78
+
+# 임베딩 및 벡터 DB 관련 
+chromadb==0.4.22
+openai==1.12.0
+
+# RAG 및 LLM 관련
+langchain==0.1.4
+langchain-openai==0.0.5
+langchain-community==0.0.14
+
+# 다국어 처리
+langdetect==1.0.9
+deep-translator==1.11.4
+
+# 유틸리티
+tqdm==4.66.1
+loguru==0.7.2
+numpy==1.26.3
+pandas==2.1.4
 tenacity==8.2.3
+python-jose==3.3.0
+
+# 테스트
+pytest==7.4.3
+
+# 웹 UI
+streamlit==1.32.0
+matplotlib==3.8.2
+plotly==5.18.0
+
+# 음성 처리
+pyaudio==0.2.13
+SpeechRecognition==3.10.0
+pydub==0.25.1
+
+# 이미지 처리
+Pillow==10.1.0

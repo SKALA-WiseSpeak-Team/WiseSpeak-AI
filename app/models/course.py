@@ -10,3 +10,4 @@ class CourseResponse(BaseModel):
     created_at: datetime
     pdf_url: str
     voice_url: str
+    total_pages: int

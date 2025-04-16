@@ -7,7 +7,7 @@ import uuid
 
 router = APIRouter()
 
-@router.get("/api/course/{id}", response_model=CourseResponse)
+@router.get("/course/{id}", response_model=CourseResponse)
 async def get_course(
     id: str,
     voice_style: str = Query(None, description="음성 스타일"),
@@ -22,6 +22,24 @@ async def get_course(
   
   if not course_info.data:
         raise HTTPException(status_code=404, detail="강의를 찾을 수 없습니다")
+  
+  # 기존 데이터 중복 체크
+  if voice_style and language:  # voice_style과 language가 모두 있는 경우에만 중복 체크
+      existing_text = supabase.table("text") \
+          .select("*") \
+          .eq("lecture_id", id) \
+          .eq("language", language) \
+          .eq("voice_type", voice_style) \
+          .execute()
+      
+      if existing_text.data:
+          raise HTTPException(
+              status_code=400,
+              detail={
+                  "message": "이미 해당 언어와 음성 타입으로 생성된 강의가 있습니다",
+                  "existing_data": existing_text.data[0]
+              }
+          )
   
   # llm에서 강의에서 받은 audio 넘겨야함
   # 임시로 갖고 있는 mp3 파일 넣었음
@@ -58,13 +76,13 @@ async def get_course(
   
   result = supabase.table("text").insert(script_data).execute()
   
-  response = {
-      "id": id,
-      "title": course_info.data["title"],
-      "description": course_info.data["description"],
-      "created_at" : course_info.data["created_at"],
-      "pdf_url": pdf_url,
-      "voice_url": voice_file_url
-  }
-  
-  return response
+  return CourseResponse(
+    id=id,
+    title=course_info.data["title"],
+    description=course_info.data["description"],
+    created_at=course_info.data["created_at"],
+    pdf_url=pdf_url,
+    total_pages=course_info.data["total_pages"],
+    language=language,
+    voice_url=voice_file_url
+  )
