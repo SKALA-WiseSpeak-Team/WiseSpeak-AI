@@ -29,6 +29,7 @@ CREATE TABLE public.text (
     voice_type VARCHAR(50),
     txt_url TEXT,
     mp3_url TEXT,
+    namespace TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
