@@ -26,9 +26,9 @@ async def chat_with_lecture(request: ChatRequest):
         )
         
         # 생성 텍스트 반환
-        return {
-            "chat_answer": response["answer"]
-        }
+        return ChatResponse(
+            chat_answer=response["answer"]
+        )
         
     except Exception as e:
         raise HTTPException(

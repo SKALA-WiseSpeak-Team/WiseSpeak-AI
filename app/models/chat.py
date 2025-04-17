@@ -11,5 +11,4 @@ class ChatRequest(BaseModel):
 
 # 챗봇 응답 스키마
 class ChatResponse(BaseModel):
-    response: str
-    sources: Optional[List[int]] = None  # 참조된 페이지 번호
+    chat_answer: str
