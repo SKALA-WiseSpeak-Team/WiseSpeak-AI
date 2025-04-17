@@ -91,19 +91,7 @@ class LectureService:
         )
         audio_path = audio_results[0]["audio_path"]
         
-        # 7. 데이터베이스에 저장 (로컬 또는 Supabase)
-        # logger.info("처리 결과 저장")
-        # lecture_id = self.supabase_client.store_lecture_data({
-        #     'filename': filename,
-        #     'language': language,
-        #     'page_count': parsed_data.get('page_count', 0),
-        #     'scripts': script_data.get('page_scripts', []),
-        #     'full_script': script_data.get('full_script', "")
-        # })
-        
-        # self.supabase_client.store_audio_mapping(lecture_id, audio_results)
-        
-        # 8. 결과 반환
+        # 7. 결과 반환
         result = {
             'filename': filename,
             'language': language,

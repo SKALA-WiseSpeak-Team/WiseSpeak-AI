@@ -34,10 +34,9 @@ async def get_course(
           .eq("lecture_id", id) \
           .eq("language", language) \
           .eq("voice_type", voice_style) \
-          .single() \
           .execute()
       
-      if existing_text.data:
+      if existing_text.data and len(existing_text.data) > 0:
           return CourseResponse(
                   id=id,
                   title=course_info.data["title"],
@@ -46,7 +45,7 @@ async def get_course(
                   pdf_url=course_info.data["pdf_url"],
                   total_pages=course_info.data["total_pages"],
                   language=language,
-                  voice_url=existing_text.data["mp3_url"]
+                  voice_url=existing_text.data[0]["mp3_url"]
                 )
   
   # pdf url에서 pdf 읽어오기
@@ -75,6 +74,9 @@ async def get_course(
   
   # audio_file supabase에 업로드
   audio_info = await VoiceService.upload_voice(audio_file, id, voice_style, language)
+  
+  # 저장한 audio_path에 있는 파일 삭제
+  print(audio_path)
   
   pdf_url = course_info.data["pdf_url"]
   voice_file_url = audio_info["voice_url"]

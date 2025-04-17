@@ -32,9 +32,9 @@ class VoiceService:
                 )
 
             except Exception as e:
-                if e.args[0]["error"] == "Duplicate":
+                if "Duplicate" in str(e):
                     # 이미 파일이 존재하면 기존 URL 반환
-                    voice_url = supabase.storage.from_(settings.STORAGE_BUCKET).get_public_url(file_path)
+                    script_url = supabase.storage.from_(settings.STORAGE_BUCKET).get_public_url(file_path)
                     return {
                         "script_file_name": file_name,
                         "script_url": script_url
