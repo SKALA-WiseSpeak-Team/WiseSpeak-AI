@@ -34,23 +34,64 @@ API 문서는 `http://localhost:8000/docs`에서 확인할 수 있습니다.
 ```
 WiseSpeak-AI/
 ├── app/
-│   ├── __init__.py
-│   ├── main.py
 │   ├── core/
 │   │   ├── __init__.py
-│   │   ├── config.py        # 설정 관련 모듈
-│   │   └── logger.py        # 로그 형식 정의
-│   ├── db
+│   │   ├── config.py          # 환경 설정
+│   │   └── logger.py          # 로깅 설정
+│   │
+│   ├── db/
 │   │   ├── __init__.py
-│   │   └── session.py       # Supabase session 관리 모듈
+│   │   └── session.py         # 데이터베이스 연결
+│   │
 │   ├── llm/
 │   │   ├── __init__.py
-│   │   ├── chroma.py 
-│   ├── models/              # 데이터 모델 정의
-│   │   └── __init__.py 
-│   └── routers/             # 라우트 처리 모듈 디렉토리
-│       └── __init__.py
-├── .env                     # 환경 변수 설정 파일
-├── requirements.txt         # 의존성 목록
-└── README.md                # 프로젝트 설명서
+│   │   ├── process_common_data.py  # 공통 데이터 처리
+│   │   ├── ai/
+│   │   │   ├── __init__.py
+│   │   │   ├── openai_client.py    # OpenAI API 클라이언트
+│   │   │   ├── rag.py             # RAG 시스템 구현
+│   │   │   └── script_gen.py      # 스크립트 생성
+│   │   ├── vector_db/            # 벡터 데이터베이스 저장소
+│   │   ├── pdf/                  # PDF 파일 저장소
+│   │   ├── audio/               # 오디오 파일 저장소
+│   │   └── language/            # 언어 관련 데이터
+│   │
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── chat.py              # 채팅 관련 모델
+│   │   ├── course.py            # 강의 관련 모델
+│   │   ├── lecture.py           # 강의 관련 모델
+│   │   └── page.py              # 페이지 관련 모델
+│   │
+│   ├── routers/
+│   │   ├── __init__.py
+│   │   ├── chat.py              # 채팅 API 엔드포인트
+│   │   ├── course.py            # 강의 API 엔드포인트
+│   │   └── lectures.py          # 강의 API 엔드포인트
+│   │
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── lecture_service.py     # 강의 관련 비즈니스 로직
+│   │   ├── lecture_rag_service.py # RAG 관련 비즈니스 로직
+│   │   ├── openai_service.py      # OpenAI API 연동
+│   │   ├── pdf_service.py         # PDF 처리 로직
+│   │   └── voice_service.py       # 음성 처리 로직
+│   │
+│   ├── data/                    # 데이터 저장소
+│   │   ├── pdf/                 # PDF 파일 저장
+│   │   ├── audio/               # 오디오 파일 저장
+│   │   └── vector_db/           # 벡터 데이터베이스
+│   │
+│   ├── uploads/                 # 업로드된 파일 임시 저장
+│   │
+│   ├── __init__.py
+│   └── main.py                  # FastAPI 앱 설정 및 실행
+│
+├── .env.example                 # 환경 변수 예시
+├── .gitignore                   # Git 제외 파일
+├── db_init.sql                  # 데이터베이스 초기화 스크립트
+├── requirements.txt             # 패키지 의존성
+├── setup.py                     # 설치 스크립트
+├── run.py                       # 실행 스크립트
+└── README.md                    # 프로젝트 문서
 ```
