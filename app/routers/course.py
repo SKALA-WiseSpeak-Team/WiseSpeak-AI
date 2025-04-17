@@ -40,12 +40,13 @@ async def get_course(
           return CourseResponse(
                   id=id,
                   title=course_info.data["title"],
-                  description=course_info.data["description"],
-                  created_at=course_info.data["created_at"],
+                  description=course_info.data[0]["description"],
+                  created_at=course_info.data[0]["created_at"],
                   pdf_url=course_info.data["pdf_url"],
-                  total_pages=course_info.data["total_pages"],
+                  total_pages=course_info.data[0]["total_pages"],
                   language=language,
-                  voice_url=existing_text.data[0]["mp3_url"]
+                  voice_url=existing_text.data[0]["mp3_url"],
+                  namespace=course_info.data[0]["namespace"]
                 )
   
   # pdf url에서 pdf 읽어오기
@@ -60,7 +61,7 @@ async def get_course(
   
   # llm에서 pdf 처리
   lecture_service = LectureService()
-  llm_result = lecture_service.process_pdf(pdf_path = tmp_path_pdf, language = language)
+  llm_result = lecture_service.process_pdf(pdf_path = tmp_path_pdf, language = language, voice=voice_style)
   
   script_text = llm_result["script_text"]
   
@@ -103,7 +104,8 @@ async def get_course(
     pdf_url=pdf_url,
     total_pages=course_info.data["total_pages"],
     language=language,
-    voice_url=voice_file_url
+    voice_url=voice_file_url,
+    namespace=llm_result["namespace"]
   )
 
 

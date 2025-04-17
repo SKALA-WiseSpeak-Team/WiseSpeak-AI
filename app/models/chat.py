@@ -6,6 +6,8 @@ from datetime import datetime
 class ChatRequest(BaseModel):
     lecture_id: str
     query: str
+    language: str
+    voice_style:str
 
 # 챗봇 응답 스키마
 class ChatResponse(BaseModel):

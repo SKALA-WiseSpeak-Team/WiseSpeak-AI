@@ -43,11 +43,9 @@ class LectureService:
     self.stt_processor = get_stt_processor()
     self.language_detector = get_language_detector()
     self.translator = get_translator()
-    # self.supabase_client = get_supabase_client()
-    
-    # logger.info("LectureRAGSystem 초기화 완료")
+
         
-  def process_pdf(self, pdf_path: str, language: str = "en") -> Dict[str, Any]:
+  def process_pdf(self, pdf_path: str, language: str = "en", voice: str = "auto", speed: float = 1.0) -> Dict[str, Any]:
     """
     PDF 처리 및 강의 생성
     
@@ -69,7 +67,10 @@ class LectureService:
         
         # 3. 벡터 DB 네임스페이스 생성 (파일명 기반)
         filename = os.path.basename(pdf_path)
-        namespace = f"lecture_{filename.replace('.', '_')}"
+        # 파일명_ns 형식으로 네임스페이스 생성 (예: test.pdf -> test_ns)
+        file_basename = os.path.splitext(filename)[0]
+        namespace = f"{file_basename}_ns"
+        logger.info(f"PDF 네임스페이스: {namespace}")
         
         # 4. 강의 스크립트 생성
         logger.info(f"강의 스크립트 생성 시작 (언어: {language})")
@@ -84,10 +85,11 @@ class LectureService:
             self.rag_system.add_page_to_knowledge(page, page_script)
         
         # 6. 스크립트를 오디오로 변환
-        logger.info(f"스크립트를 오디오로 변환 시작 (언어: {language})")
+        logger.info(f"스크립트를 오디오로 변환 시작 (언어: {language}, 음성: {voice})")
         audio_results = self.tts_processor.generate_script_audio(
             script_data.get('page_scripts', []),
-            language=language
+            language=language,
+            voice=voice  # voice 파라미터 전달
         )
         audio_path = audio_results[0]["audio_path"]
         
@@ -95,6 +97,8 @@ class LectureService:
         result = {
             'filename': filename,
             'language': language,
+            'voice': voice,
+            'speed': speed,
             'script_text': script_text,
             'audio_path': audio_path,
             'namespace': namespace
