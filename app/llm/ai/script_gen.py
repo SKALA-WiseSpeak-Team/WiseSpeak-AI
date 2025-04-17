@@ -170,8 +170,6 @@ class ScriptGenerator:
             # 모든 페이지 스크립트를 하나로 연결
             full_script = "\n\n".join(all_scripts)
             result["full_script"] = full_script
-            # logger.info(f"문서 전체 스크립트 생성 완료: {len(pages)} 페이지, full_script 길이: {len(full_script)} 자")
-            # logger.info(f"전체 스크립트 내용: {full_script}")
             
             return result
         except Exception as e:
