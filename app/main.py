@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import lectures, chat, course
+from pydantic import AnyHttpUrl
+import json
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -13,6 +15,7 @@ if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        # allow_origins=settings.BACKEND_CORS_ORIGINS,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
         allow_headers=["*"],

@@ -4,8 +4,8 @@ import PyPDF2
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from fastapi import UploadFile
-from app.db.session import supabase
 from app.core.config import settings
+from app.db.session import supabase
 
 class PDFService:
     @staticmethod

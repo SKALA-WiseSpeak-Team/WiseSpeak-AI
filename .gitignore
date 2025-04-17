@@ -13,3 +13,63 @@ __pycache__/
 myvenv/
 .vscode/
 .env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 가상환경
+venv/
+env/
+ENV/
+.env
+.flaskenv
+
+# IDE 설정
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 백업 파일
+backup/
+*.bak
+*~
+
+# 개인 설정 파일
+config.json
+
+# 데이터 폴더
+/data/*
+!/data/pdf/
+/data/pdf/*
+!/data/pdf/sample.pdf
+/data/audio/
+/data/output/
+
+# 애플리케이션 특정 파일
+chroma_db/
+*.log
+.coverage
+htmlcov/
+logs/
+output/
+instance/
+.webassets-cache
