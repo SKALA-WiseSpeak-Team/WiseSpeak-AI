@@ -40,13 +40,13 @@ async def get_course(
           return CourseResponse(
                   id=id,
                   title=course_info.data["title"],
-                  description=course_info.data[0]["description"],
-                  created_at=course_info.data[0]["created_at"],
+                  description=course_info.data["description"],
+                  created_at=course_info.data["created_at"],
                   pdf_url=course_info.data["pdf_url"],
-                  total_pages=course_info.data[0]["total_pages"],
+                  total_pages=course_info.data["total_pages"],
                   language=language,
                   voice_url=existing_text.data[0]["mp3_url"],
-                  namespace=course_info.data[0]["namespace"]
+                  namespace=existing_text.data[0]["namespace"]
                 )
   
   # pdf url에서 pdf 읽어오기
@@ -89,7 +89,8 @@ async def get_course(
     "language": language,
     "voice_type": voice_style,
     "txt_url": script_file_url,
-    "mp3_url": voice_file_url
+    "mp3_url": voice_file_url,
+    "namespace": llm_result["namespace"]
   }
   
   result = supabase.table("text").insert(script_data).execute()
