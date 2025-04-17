@@ -11,3 +11,4 @@ class CourseResponse(BaseModel):
     pdf_url: str
     voice_url: str
     total_pages: int
+    namespace: str
