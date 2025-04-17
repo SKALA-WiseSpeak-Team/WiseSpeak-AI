@@ -11,6 +11,7 @@ from app.llm.ai.openai_client import get_openai_client
 from app.llm.vector_db.embeddings import get_embedder
 from app.core.config import settings
 
+from app.llm.language.instructions import get_language_instructions
 from app.llm.audio.tts import get_tts_processor
 
 logger = logging.getLogger(__name__)
@@ -63,18 +64,37 @@ class RAGSystem:
             language_instructions = self._get_language_instructions(language)
             
             # 프롬프트 준비
-            system_prompt = f"""You are an educational assistant that helps with questions about lecture content.
+            system_prompt = f"""당신은 강의 자료와 교육 콘텐츠에 기반하여 정확한 정보를 제공하는 전문 교육 비서입니다.
             {language_instructions}
             
-            Follow these guidelines:
-            1. Answer the question accurately based on the provided context
-            2. If the context doesn't contain the answer, say you don't have enough information
-            3. Be clear, helpful, and educational in your tone
-            4. Keep answers concise but comprehensive
-            5. If referring to images or diagrams, mention that they are not directly visible
-            
-            Answer only based on the provided context, without adding speculative information."""
-            
+            다음 체계적인 지침에 따라 응답하세요:
+ 
+            1. 증거 기반 분석 단계:
+            a. 제공된 컨텍스트를 철저히 분석하고 질문의 핵심 의도 파악
+                b. 컨텍스트 내에서 사실 기반 정보만 추출하여 검증
+                c. 관련 없는 정보나 불확실한 정보는 명확히 배제
+
+            2. 명확한 한계 인식:
+                a. 컨텍스트에 명시적으로 포함된 정보만 활=용
+                b. 정보가 불충분할 경우 "제공된 자료에는 이 질문에 대한 충분한 정보가 없습니다"라고 정직하게 언급
+                c. 추측이나 일반화는 절대 하지 않음
+
+            3. 문화적 맥락 존중:
+                a. 해당 언어의 문화적 뉴앙스와 표현 방식 고려
+                b. 현지 교육 환경에 적합한 용어와 예시 사용
+                c. 문화적 오해를 일으킬 수 있는 직역이나 표현 피하기
+
+            4. 교육적 전달 방식:
+                a. 명확하고 논리적인 구조로 정보 제시
+                b. 복잡한 개념은 단계적으로 설명
+                c. 교육자의 전문적이고 친절한 어조 유지
+
+            5. 시각 자료 참조 시:
+                a. 이미지나 도표가 직접 보이지 않음을 명시
+                b. 시각 자료의 내용과 목적을 텍스트로 명확히 설명
+
+            제공된 컨텍스트만 엄격하게 기반으로 응답하고, 확실하지 않은 정보는 절대 포함하지 마세요. 정확성이 가장 중요한 가치입니다."""
+        
             prompt = [
                 {"role": "system", "content": system_prompt}
             ]
@@ -114,7 +134,8 @@ class RAGSystem:
             audio_path = tts_processor.text_to_speech(
                 text=answer,
                 language=language,
-                voice="auto"
+                voice="auto",
+                apply_patterns=True
             )
             
             # 결과 구성
@@ -229,24 +250,8 @@ class RAGSystem:
         Returns:
             언어 지침
         """
-        language = language.lower()
-        
-        # 지원하지 않는 언어인 경우 영어로 기본 설정
-        if language not in settings.SUPPORTED_LANGUAGES:
-            logger.warning(f"지원하지 않는 언어: {language}, 영어로 대체합니다")
-            language = "en"
-        
-        instructions = {
-            "en": "Respond in English using clear, natural language.",
-            "ko": "Respond in Korean (한국어). Use natural, idiomatic Korean expressions.",
-            "ja": "Respond in Japanese (日本語). Use natural, idiomatic Japanese expressions.",
-            "zh": "Respond in Chinese (中文). Use natural, idiomatic Chinese expressions.",
-            "es": "Respond in Spanish. Use natural, idiomatic Spanish expressions.",
-            "fr": "Respond in French. Use natural, idiomatic French expressions.",
-            "de": "Respond in German. Use natural, idiomatic German expressions."
-        }
-        
-        return instructions.get(language, instructions["en"])
+        from app.llm.language.instructions import get_language_instructions
+        return get_language_instructions(language)
 
 
 def get_rag_system(namespace: str = "default") -> RAGSystem:
@@ -277,7 +282,7 @@ def add_common_knowledge_to_default(document_text: str, metadata: Optional[Dict[
     return rag_system.add_document_to_knowledge(document_text, metadata)
 
 
-def process_query(query_text: str, language: str = "en", namespace: str = "default") -> Dict[str, Any]:
+def process_query(query_text: str, language: str = "en", namespace: str = "default", use_history: bool = True) -> Dict[str, Any]:
     """
     쿼리 처리 헬퍼 함수
     
@@ -285,12 +290,13 @@ def process_query(query_text: str, language: str = "en", namespace: str = "defau
         query_text: 질문 텍스트
         language: 언어 코드
         namespace: 벡터 DB 네임스페이스
+        use_history: 대화 히스토리 사용 여부
     
     Returns:
         생성된 답변 및 관련 정보
     """
     rag_system = get_rag_system(namespace)
-    return rag_system.query(query_text, language)
+    return rag_system.query(query_text, language, use_history)
 
 
 def add_document_knowledge(document_text: str, metadata: Optional[Dict[str, Any]] = None, namespace: str = "default") -> List[str]:

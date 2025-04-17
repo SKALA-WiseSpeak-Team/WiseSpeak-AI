@@ -2,11 +2,13 @@
 # Text-to-Speech - 텍스트를 음성으로 변환하는 기능
 
 import os
-from typing import Dict, List, Any, Optional, Union
+from typing import Dict, List, Any, Optional, Union, Tuple
 import logging
 import json
 from pathlib import Path
 import time
+import random
+from enum import Enum
 
 from app.llm.ai.openai_client import get_openai_client, get_language_voice
 from app.core.config import settings
@@ -29,13 +31,135 @@ class TTSProcessor:
         # 출력 디렉토리 생성
         os.makedirs(output_dir, exist_ok=True)
     
+    def apply_speech_patterns(self, text: str, voice: str) -> Tuple[str, float]:
+        """
+        음성 패턴을 텍스트에 적용
+        
+        Args:
+            text: 원본 텍스트
+            voice: 음성 유형
+        
+        Returns:
+            수정된 텍스트와 기본 속도 튜플
+        """
+        try:
+            # 기본 속도 설정
+            base_speed = 1.0
+            voice_char = settings.VOICE_CHARACTERISTICS.get(voice, {})
+            
+            # TTS_SPEECH_PATTERNS에서 데이터 가져오기
+            speed_variations = settings.TTS_SPEECH_PATTERNS.get("speed_variations", {})
+            pause_patterns = settings.TTS_SPEECH_PATTERNS.get("pause_patterns", {})
+            
+            # 목소리 특성에 따른 기본 속도 조정
+            role = voice_char.get("role", "")
+            if "교수" in role or "원로" in role:
+                # 교수 타입은 약간 느린 경향
+                base_speed *= 0.95
+            elif "퍼실리테이터" in role or "활기찬" in role:
+                # 활기찬 타입은 약간 빠른 경향
+                base_speed *= 1.05
+            
+            # 나이대에 따른 속도 조정
+            age = voice_char.get("age", "")
+            if age and age.endswith("대"):
+                age_num = int(age[:-1])
+                if age_num >= 50:
+                    # 나이가 많을수록 느린 경향
+                    base_speed *= 0.95
+                elif age_num <= 30:
+                    # 나이가 적을수록 빠른 경향
+                    base_speed *= 1.05
+            
+            # 텍스트 내용 분석을 통한 속도 조정 패턴 적용
+            # 1. 페이지 전환 안내 검색
+            if "다음 페이지로 넘어가기 위해 5초간 기다려 주세요" in text or "지금부터 5초 후에 본격적인 강의를 시작하겠습니다" in text:
+                page_transition_factor = speed_variations.get("page_transition", 0.8)
+                base_speed *= page_transition_factor
+                logger.info(f"페이지 전환 안내 발견: 속도 조정 적용 ({page_transition_factor})")
+            
+            # 2. 새로운 주제 도입 검색
+            new_topic_keywords = ["이제 살펴볼 주제는", "다음 주제로", "이번에는", "이어서 살펴볼", "이번 주제는"]
+            for keyword in new_topic_keywords:
+                if keyword in text:
+                    new_topic_factor = speed_variations.get("new_topic", 0.9)
+                    base_speed *= new_topic_factor
+                    logger.info(f"새로운 주제 도입 발견: 속도 조정 적용 ({new_topic_factor})")
+                    break
+            
+            # 3. 중요 포인트 강조 검색
+            important_keywords = ["중요한 것", "핵심 개념", "반드시 기억해야 할", "나중에 다시 설명하겠지만", "반드시 알아두어야 합니다", "뽑때는 점"]
+            for keyword in important_keywords:
+                if keyword in text:
+                    important_factor = speed_variations.get("important_point", 0.85)
+                    base_speed *= important_factor
+                    logger.info(f"중요 내용 강조 표현 발견: 속도 조정 적용 ({important_factor})")
+                    break
+            
+            # 4. 유머 표현 검색
+            humor_keywords = ["재미있게도", "하하", "우스움", "재미있는 예로", "재밌는 부분", "재밌는 사실", "주목할 점", "신기하게도"]
+            for keyword in humor_keywords:
+                if keyword in text:
+                    humor_factor = speed_variations.get("humor", 1.15)
+                    base_speed *= humor_factor
+                    logger.info(f"유머 표현 발견: 속도 조정 적용 ({humor_factor})")
+                    break
+            
+            # 5. 예시 설명 검색
+            example_keywords = ["예를 들어", "예시를 들어보면", "다음과 같은 사례", "실제 상황에서", "인사이트", "예시를 살펴볼까요", "예를 들어볼까요"]
+            for keyword in example_keywords:
+                if keyword in text:
+                    example_factor = speed_variations.get("examples", 1.1)
+                    base_speed *= example_factor
+                    logger.info(f"예시 설명 발견: 속도 조정 적용 ({example_factor})")
+                    break
+                    
+            # 6. 요약 및 마무리 검색
+            summary_keywords = ["요약하자면", "정리하자면", "마무리하면", "정리해보자면", "지금까지 살펴본", "지글까지 배운"]
+            for keyword in summary_keywords:
+                if keyword in text:
+                    summary_factor = speed_variations.get("summary", 1.0)
+                    base_speed *= summary_factor
+                    logger.info(f"요약 및 마무리 발견: 속도 조정 적용 ({summary_factor})")
+                    break
+                    
+            # SSML이 지원되지 않으로 문장과 단락 사이의 휴지(멈춤)를 적용할 수 없지만,
+            # 텍스트 분석 결과를 로그로 기록하여 휴지 패턴을 활용한 것처럼 요소를 추적
+            
+            # 중요 개념 전후 휴지 패턴 검색
+            key_concept_keywords = ["핵심 개념", "주요 원리", "중요한 원칙", "핵심 원리"]
+            for keyword in key_concept_keywords:
+                if keyword in text:
+                    # SSML이 지원되면 이 부분에 pause_patterns.get("key_concept") 값을 사용하여 휴지 삽입 가능
+                    pause_range = pause_patterns.get("key_concept", [900, 1100])
+                    avg_pause = sum(pause_range) / len(pause_range)
+                    logger.info(f"핵심 개념 전후 휴지 패턴 발견: 평균 {avg_pause}ms 휴지 필요 (실제로는 SSML 미지원으로 적용되지 않음)")
+                    break
+            
+            # 개행(단락 구분) 패턴 검색 - 휴지가 필요한 부분 로그로 기록
+            paragraph_breaks = text.count('\n\n')
+            if paragraph_breaks > 0:
+                pause_range = pause_patterns.get("paragraph", [700, 900])
+                avg_pause = sum(pause_range) / len(pause_range)
+                logger.info(f"단락 구분 {paragraph_breaks}개 발견: 부분별 평균 {avg_pause}ms 휴지 필요 (실제로는 SSML 미지원으로 적용되지 않음)")
+            
+            # API 한계로 인한 속도 범위 클램핑 (0.25~4.0)
+            base_speed = max(0.25, min(4.0, base_speed))
+            
+            return text, base_speed
+        except Exception as e:
+            logger.warning(f"음성 패턴 적용 실패: {str(e)}")
+            return text, 1.0
+    
+    
     def text_to_speech(
         self, 
         text: str, 
         output_filename: Optional[str] = None, 
         voice: str = "alloy",
         language: str = "en",
-        speed: float = 1.0
+        speed: float = 1.0,
+        apply_patterns: bool = True
     ) -> str:
         """
         텍스트를 음성으로 변환하고 파일로 저장
@@ -54,6 +178,21 @@ class TTSProcessor:
             # 언어에 맞는 음성 선택 (파라미터로 받은 voice가 우선)
             if voice == "auto":
                 voice = get_language_voice(language)
+                
+            # 음성 패턴 적용 (옵션)
+            actual_speed = speed
+            if apply_patterns:
+                # 패턴 적용하여 텍스트 전처리 및 속도 조정
+                processed_text, base_voice_speed = self.apply_speech_patterns(text, voice)
+                text = processed_text
+                actual_speed = speed * base_voice_speed  # 기본 속도에 사용자 설정 속도 적용
+                
+                # API 한계로 인해 속도 범위 클램핑 (0.25~4.0)
+                actual_speed = max(0.25, min(4.0, actual_speed))
+                
+                # 로그 추가
+                if actual_speed != speed:
+                    logger.info(f"음성 특성 반영: {voice} 목소리의 속도가 {speed} 에서 {actual_speed} 으로 조정되었습니다.")
             
             # 출력 파일 이름이 없으면 자동 생성
             if output_filename is None:
@@ -76,7 +215,7 @@ class TTSProcessor:
                     text=text,
                     voice=voice,
                     output_format="mp3",
-                    speed=speed
+                    speed=actual_speed
                 )
                 
                 # 오디오 파일 저장
@@ -87,7 +226,7 @@ class TTSProcessor:
                 return output_path
             else:
                 # 텍스트가 너무 길면 분할 처리
-                return self._process_long_text(text, output_path, voice, speed)
+                return self._process_long_text(text, output_path, voice, actual_speed)
         except Exception as e:
             logger.error(f"TTS 변환 실패: {str(e)}")
             raise
@@ -207,12 +346,33 @@ class TTSProcessor:
         
         return result
     
+    def get_voice_info(self, voice: str) -> Dict[str, Any]:
+        """
+        목소리 특성 정보 가져오기
+        
+        Args:
+            voice: 목소리 이름
+        
+        Returns:
+            목소리 특성 정보
+        """
+        return settings.VOICE_CHARACTERISTICS.get(voice, {
+            "age": "40대",
+            "role": "교육자",
+            "style": "일반적인 분명한 발음",
+            "speed": "중간 속도",
+            "features": "기본 특성",
+            "culture": "전체 문화권에 적합"
+        })
+    
+    
     def generate_script_audio(
         self, 
         scripts: List[Dict[str, Any]], 
         language: str = "en",
         voice: str = "auto",
-        speed: float = 1.0
+        speed: float = 1.0,
+        apply_patterns: bool = True
     ) -> List[Dict[str, Any]]:
         """
         스크립트 리스트를 오디오로 변환
@@ -271,15 +431,20 @@ class TTSProcessor:
                 output_filename=output_filename,
                 voice=voice,
                 language=language,
-                speed=speed
+                speed=speed,
+                apply_patterns=apply_patterns
             )
+            
+            # 목소리 특성 정보 가져오기
+            voice_info = self.get_voice_info(voice)
             
             # 결과 목록에 하나의 항목만 추가
             result = [{
                 "pages": page_numbers,
                 "audio_path": audio_path,
                 "language": language,
-                "voice": voice
+                "voice": voice,
+                "voice_characteristics": voice_info
             }]
             
             logger.info(f"스크립트 {len(page_numbers)}개 페이지를 하나의 오디오로 변환 완료: {audio_path}")
@@ -305,7 +470,8 @@ def text_to_speech_file(
     output_filename: Optional[str] = None, 
     voice: str = "alloy",
     language: str = "en",
-    speed: float = 1.0
+    speed: float = 1.0,
+    apply_patterns: bool = True
 ) -> str:
     """
     텍스트를 음성으로 변환하고 파일로 저장하는 헬퍼 함수
@@ -321,4 +487,4 @@ def text_to_speech_file(
         생성된 오디오 파일 경로
     """
     processor = get_tts_processor()
-    return processor.text_to_speech(text, output_filename, voice, language, speed)
+    return processor.text_to_speech(text, output_filename, voice, language, speed, apply_patterns)

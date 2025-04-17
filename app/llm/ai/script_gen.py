@@ -96,20 +96,41 @@ class ScriptGenerator:
             language_instructions = self._get_language_instructions(language)
             
             prompt = [
-                {"role": "system", "content": f"""You are an expert educator who creates professional lecture scripts. 
-                Your task is to create an engaging and informative lecture script for a specific page from an educational document.
+                {"role": "system", "content": f"""당신은 고도로 전문화된 교육 콘텐츠 설계자로, 교육 문서의 각 페이지에 대한 매력적이고 효과적인 강의 스크립트를 작성합니다.
                 {language_instructions}
                 
-                Follow these guidelines:
-                1. Focus on the main topics and concepts presented on this page
-                2. Explain complex ideas clearly and provide context
-                3. Refer to any images, tables, or diagrams that are mentioned on the page
-                4. Structure the lecture in a logical flow
-                5. Use an engaging, educational tone
-                6. Keep the script concise but comprehensive
-                7. The script should be between 300-500 words
-                
-                Create only the lecture script, without any additional explanations or meta-commentary."""}
+                다음 전문 교육 설계 프레임워크를 따르세요:
+    
+                1. 전체 강의 흐름 고려:
+                    a. 이전 페이지 내용과의 연결성 확인
+                    b. 현재 페이지의 위치를 전체 강의 맥락에서 파악
+                    c. 다음 페이지로의 자연스러운 전환 준비
+    
+                2. 시간 계획 준수:
+                    a. 30초~2분 분량의 강의 스크립트 작성(페이지 내용 복잡성에 따라 조정)
+                    b. 평균 속도로 읽을 때 약 150~400단어 내외로 유지
+                    c. 핵심 개념과 설명에 시간 배분 최적화
+    
+                    3. 효과적인 구조화:
+                        a. 명확한 도입부: 주제 소개 및 이전 내용과 연결 (15-30초)
+                        b. 체계적인 본문: 핵심 개념 설명, 예시 제공, 중요 내용 강조 (1분-1분 30초)
+                        c. 요약 결론: 핵심 요약 및 다음 내용 예고 (15-30초)
+    
+                    4. 문화적 맥락 통합:
+                        a. 해당 언어권의 교육 방식과 표현 특성 반영
+                        b. 현지 학습자에게 친숙한 비유와 예시 활용
+                        c. 필요시 문화적 맥락에 맞는 자연스러운 유머 요소 적절히 포함 (강제적이지 않게)
+    
+                    5. 시각 자료 활용:
+                        a. 페이지의 이미지, 표, 도표 등을 스크립트에 효과적으로 연결
+                        b. 시각 자료의 핵심 포인트를 명확히 설명
+                        c. 학습자가 시각 자료를 보며 이해할 수 있도록 안내
+    
+                    6. 페이지 전환 안내:
+                        a. 스크립트 마지막에 다음과 같은 문구 포함: "이 페이지의 설명을 마쳤습니다. 다음 페이지로 넘어가기 위해 5초간 기다려 주세요."
+                        b. 페이지 전환 대기 시간을 학습 내용 정리 기회로 활용하는 짧은 안내 추가
+    
+                    강의 스크립트만 작성하고, 추가 설명이나 메타 코멘트는 포함하지 마세요."""}                
             ]
             
             # 페이지 컨텍스트 추가
@@ -222,18 +243,42 @@ class ScriptGenerator:
             language_instructions = self._get_language_instructions(language)
             
             prompt = [
-                {"role": "system", "content": f"""You are an expert educator who creates professional lecture introductions.
-                Your task is to create an engaging overview introduction for an educational document.
+                {"role": "system", "content": f"""당신은 학습자의 호기심과 동기를 최대화하는 문화적 공감대를 형성하는 교육 전문가입니다. 교육 문서에 대한 매력적이고 효과적인 개요 소개를 작성하세요.
                 {language_instructions}
                 
-                Follow these guidelines:
-                1. Create a clear and engaging introduction to the document/lecture
-                2. Mention the main topics that will be covered
-                3. Explain why this content is important or relevant
-                4. Set expectations for what learners will gain
-                5. Keep the introduction between 200-300 words
-                
-                Create only the introduction script, without any additional explanations or meta-commentary."""}
+                다음 학습자 중심 개요 설계 원칙을 따르세요:
+    
+                1. 강력한 첫인상 형성:
+                    a. 학습자의 관심을 즐시 사로잡는 흥미로운 질문이나 사례로 시작
+                    b. 학습 주제의 실용적 중요성과 가치 강조
+                    c. 해당 언어권 학습자의 문화적 관심사와 연결점 제시
+    
+                2. 학습 여정의 청사진 제공:
+                    a. 전체 문서의 구조와 학습 경로를 명확히 시각화
+                    b. 각 주요 섹션의 핵심 주제와 기대 학습 성과 소개
+                    c. 학습 여정의 논리적 진행과 발전 방향 제시
+    
+                3. 문화적 연결고리 구축:
+                    a. 해당 문화권에서 이해하기 쉽운 비유와 사례 활용
+                    b. 현지 교육 맥락과 학습 스타일에 맞는 접근법 채택
+                    c. 문화적 배경에 적합한 자연스러운 유머 요소 통합 (강제적이지 않게)
+    
+                4. 학습 가치 명확화:
+                    a. 학습자가 얻게 될 구체적인 지식과 기술 명시
+                    b. 실제 상황에서의 적용 가능성과 혜택 설명
+                    c. 개인적/전문적 성장에 미치는 영향 강조
+    
+                5. 학습자 중심 기대 설정:
+                    a. 접근 가능하고 성취 가능한 학습 목표 제시
+                    b. 학습 과정에서 만날 수 있는 도전과 해결 방안 언급
+                    c. 성공적인 학습을 위한 조언과 전략 제공
+    
+                6. 학습 시작 안내:
+                    a. 호기심과 기대감을 높이는 강의 시작 안내
+                    b. 스크립트 마지막에 "지금부터 5초 후에 본격적인 강의를 시작하겠습니다." 문구 포함
+                    c. 학습 여정에 대한 긍정적인 기대감 형성
+    
+                    개요는 200-300단어로 제한하고, 실제 강의자의 자연스러운 말투로 작성하세요. 추가 설명이나 메타 코멘트 없이 오직 소개 스크립트만 제공하세요."""}                
             ]
             
             # 문서 컨텍스트 추가
@@ -265,24 +310,8 @@ class ScriptGenerator:
         Returns:
             언어 지침
         """
-        language = language.lower()
-        
-        # 지원하지 않는 언어인 경우 영어로 기본 설정
-        if language not in settings.SUPPORTED_LANGUAGES:
-            logger.warning(f"지원하지 않는 언어: {language}, 영어로 대체합니다")
-            language = "en"
-        
-        instructions = {
-            "en": "Create the script in English using natural, clear language.",
-            "ko": "Create the script in Korean (한국어). Use natural, idiomatic Korean expressions.",
-            "ja": "Create the script in Japanese (日本語). Use natural, idiomatic Japanese expressions.",
-            "zh": "Create the script in Chinese (中文). Use natural, idiomatic Chinese expressions.",
-            "es": "Create the script in Spanish. Use natural, idiomatic Spanish expressions.",
-            "fr": "Create the script in French. Use natural, idiomatic French expressions.",
-            "de": "Create the script in German. Use natural, idiomatic German expressions."
-        }
-        
-        return instructions.get(language, instructions["en"])
+        from app.llm.language.instructions import get_language_instructions
+        return get_language_instructions(language)
 
 
 def generate_script(parsed_document: Dict[str, Any], language: str = "en", namespace: str = "default") -> Dict[str, Any]:
