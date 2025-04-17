@@ -59,18 +59,7 @@ class LectureRAGSystem:
             처리 결과
         """
         try:
-            # # 1. 음성을 텍스트로 변환
-            # logger.info("음성을 텍스트로 변환")
-            # stt_result = self.stt_processor.speech_to_text_from_bytes(audio_data)
-            
-            # query_text = stt_result.get('text', '')
-            # detected_language = stt_result.get('language', 'en')
-            
-            # if not query_text:
-            #     logger.warning("변환된 질의 텍스트가 없습니다")
-            #     return {'error': '질의를 인식할 수 없습니다.'}
-            
-            # 2. 벡터 DB에서 RAG 기반 답변 생성
+            # 1. 벡터 DB에서 RAG 기반 답변 생성
             logger.info(f"RAG 기반 답변 생성 (언어: {language})")
             rag_result = self.rag_system.query(audio_data, language, namespace=namespace)
             
@@ -80,15 +69,7 @@ class LectureRAGSystem:
                 logger.warning("생성된 답변이 없습니다")
                 return {'error': '답변을 생성할 수 없습니다.'}
             
-            # 3. 답변을 음성으로 변환
-            # logger.info(f"답변을 음성으로 변환 (언어: {language})")
-            # answer_audio = self.tts_processor.text_to_speech(
-            #     text=answer_text,
-            #     language=language,
-            #     voice="auto"
-            # )
-            
-            # 4. 결과 반환
+            # 2. 결과 반환
             result = {
                 'query': audio_data,
                 'query_language': language,
