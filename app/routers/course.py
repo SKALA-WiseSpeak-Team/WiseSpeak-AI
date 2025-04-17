@@ -34,6 +34,7 @@ async def get_course(
           .eq("lecture_id", id) \
           .eq("language", language) \
           .eq("voice_type", voice_style) \
+          .single() \
           .execute()
       
       if existing_text.data:
