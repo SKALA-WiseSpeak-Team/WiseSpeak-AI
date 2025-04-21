@@ -53,7 +53,7 @@ matplotlib==3.8.2
 plotly==5.18.0
 
 # 음성 처리
-pyaudio==0.2.13
+# pyaudio==0.2.13
 SpeechRecognition==3.10.0
 pydub==0.25.1
 

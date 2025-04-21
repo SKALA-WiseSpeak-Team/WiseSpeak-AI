@@ -82,7 +82,7 @@ class LectureService:
         for i, page in enumerate(parsed_data.get('pages', [])):
             page_script = next((item['script'] for item in script_data.get('page_scripts', []) 
                                 if item['page_number'] == page.get('page_number')), "")
-            self.rag_system.add_page_to_knowledge(page, page_script)
+            self.rag_system.add_page_to_knowledge(page, page_script, namespace)
         
         # 6. 스크립트를 오디오로 변환
         logger.info(f"스크립트를 오디오로 변환 시작 (언어: {language}, 음성: {voice})")

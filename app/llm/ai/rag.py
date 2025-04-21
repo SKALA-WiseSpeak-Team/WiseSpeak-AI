@@ -32,10 +32,11 @@ class RAGSystem:
         self.conversation_history = []
     
     # RAGSystem 클래스 내의 query 메서드 변경
-    def query(self, query_text: str, language: str = "en", use_history: bool = True, namespace: Optional[str] = None, namespaces: Optional[List[str]] = None) -> Dict[str, Any]:
+    def query(self, query_text: str, language: str = "en", use_history: bool = True, namespace: Optional[str] = None) -> Dict[str, Any]:
         # 여러 네임스페이스를 참조하는 경우 처리
         # namespaces가 있으면 여러 네임스페이스를 참조, 없으면 단일 네임스페이스 사용
         query_namespace = namespace if namespace is not None else self.namespace
+        namespaces = ["default", query_namespace]
         
         try:
             # 벡터 DB에서 관련 컨텍스트 검색
@@ -54,6 +55,7 @@ class RAGSystem:
                 relevant_docs = sorted(all_relevant_docs, key=lambda x: x.get("score", 0), reverse=True)[:5]
                 logger.info(f"네임스페이스 검색 결과: {len(relevant_docs)}개 문서")
             else:
+                logger.info("dsklajlkdj;glakgj")
                 # 단일 네임스페이스 검색
                 relevant_docs = self.embedder.query_similar(query_text, n_results=5, namespace=query_namespace)
             
@@ -166,7 +168,7 @@ class RAGSystem:
                 "relevant_sources": []
             }
     
-    def add_document_to_knowledge(self, document_text: str, metadata: Optional[Dict[str, Any]] = None) -> List[str]:
+    def add_document_to_knowledge(self, document_text: str, metadata: Optional[Dict[str, Any]] = None, namespace: Optional[str] = None) -> List[str]:
         """
         문서를 지식 베이스에 추가
         
@@ -189,7 +191,7 @@ class RAGSystem:
                     chunk["metadata"].update(metadata)
             
             # 벡터 DB에 추가
-            chunk_ids = self.embedder.add_document_chunks(chunks, self.namespace)
+            chunk_ids = self.embedder.add_document_chunks(chunks, namespace)
             
             logger.info(f"{len(chunk_ids)}개 청크를 지식 베이스에 추가했습니다")
             return chunk_ids
@@ -197,7 +199,7 @@ class RAGSystem:
             logger.error(f"문서 추가 실패: {str(e)}")
             return []
     
-    def add_page_to_knowledge(self, page_data: Dict[str, Any], page_script: Optional[str] = None) -> List[str]:
+    def add_page_to_knowledge(self, page_data: Dict[str, Any], page_script: Optional[str] = None, namespace: Optional[str] = None) -> List[str]:
         """
         페이지 데이터를 지식 베이스에 추가
         
@@ -230,7 +232,7 @@ class RAGSystem:
                 metadata["title"] = titles[0]
             
             # 지식 베이스에 추가
-            return self.add_document_to_knowledge(combined_text, metadata)
+            return self.add_document_to_knowledge(combined_text, metadata, namespace)
         except Exception as e:
             logger.error(f"페이지 추가 실패: {str(e)}")
             return []
